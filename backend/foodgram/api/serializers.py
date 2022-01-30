@@ -1,17 +1,37 @@
 from rest_framework import serializers
-from users.models import User
+from djoser.compat import get_user_email_field_name
+from rest_framework import serializers
+from djoser.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+
+User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'password')
+class TokenCreateSerializer(serializers.Serializer):
+    password = serializers.CharField(required=False, style={"input_type": "password"})
 
-    def create(self, validated_data):
-        return User.objects.get_or_create(**validated_data)[0]
+    default_error_messages = {
+        "invalid_credentials": settings.CONSTANTS.messages.INVALID_CREDENTIALS_ERROR,
+        "inactive_account": settings.CONSTANTS.messages.INACTIVE_ACCOUNT_ERROR,
+    }
 
-    def validate_username(self, value):
-        if value == "me":
-            raise serializers.ValidationError("me - недопустимый username")
-        return value
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = None
 
+        self.email_field = get_user_email_field_name(User)
+        self.fields[self.email_field] = serializers.EmailField()
+
+    def validate(self, attrs):
+        password = attrs.get("password")
+        email = attrs.get("email")
+        self.user = authenticate(
+            request=self.context.get("request"), email=email, password=password
+        )
+        if not self.user:
+            self.user = User.objects.filter(email=email).first()
+            if self.user and not self.user.check_password(password):
+                self.fail("invalid_credentials")
+        if self.user and self.user.is_active:
+            return attrs
+        self.fail("invalid_credentials")
