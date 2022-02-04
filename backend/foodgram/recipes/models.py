@@ -23,16 +23,22 @@ class Tag(models.Model):
         verbose_name='slug'
     )
 
+    def __str__(self):
+        return self.name
+
 
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название'
     )
-    units = models.CharField(
+    measurement_unit = models.CharField(
         max_length=200,
         verbose_name='Единицы измерения'
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
@@ -47,8 +53,8 @@ class Recipe(models.Model):
         db_index=True,
         verbose_name='Название',
     )
-    image = models.ImageField(
-        upload_to='media/recipes/images/',
+    image = models.CharField(
+        max_length=200,
         verbose_name='Картинка, закодированная в Base64'
     )
     text = models.TextField(
@@ -69,6 +75,9 @@ class Recipe(models.Model):
         related_name="recipes",
         through="IngredientInRecipe")
 
+    def __str__(self):
+        return self.name
+
 
 class IngredientInRecipe(models.Model):
     recipe = models.ForeignKey(
@@ -87,3 +96,44 @@ class IngredientInRecipe(models.Model):
             MinValueValidator(1, "Минимальное количество ингредиентов 1"),
         )
     )
+
+    def __str__(self):
+        return f'{self.recipe} - {self.ingredient}'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='favorite',
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name="favorite",
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "recipe"],
+                                    name="unique_favorite")
+        ]
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name="shopping_cart",
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name="shopping_cart",
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "recipe"],
+                                    name="unique_shopping_list")
+        ]

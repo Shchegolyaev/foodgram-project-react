@@ -2,9 +2,36 @@ from rest_framework import serializers
 from djoser.compat import get_user_email_field_name
 from rest_framework import serializers
 from djoser.conf import settings
+from users.models import Follow
 from django.contrib.auth import authenticate, get_user_model
+from djoser.compat import get_user_email, get_user_email_field_name
 
 User = get_user_model()
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        if Follow.objects.filter(user=User.objects.get(username=obj.username),
+                                 author=self.context['request'].user).exists():
+            return True
+        return False
+
+    def update(self, instance, validated_data):
+        email_field = get_user_email_field_name(User)
+        if settings.SEND_ACTIVATION_EMAIL and email_field in validated_data:
+            instance_email = get_user_email(instance)
+            if instance_email != validated_data[email_field]:
+                instance.is_active = False
+                instance.save(update_fields=["is_active"])
+        return super().update(instance, validated_data)
 
 
 class TokenCreateSerializer(serializers.Serializer):

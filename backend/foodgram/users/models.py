@@ -34,3 +34,16 @@ class User(AbstractUser):
     )
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
+
+class Follow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name="follower")
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name="following")
+
+    class Meta:
+        db_table = 'db_follow'
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='user_author')
+        ]

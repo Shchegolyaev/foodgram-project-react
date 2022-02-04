@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'djoser',
     'api',
     'users',
+    'recipes',
 ]
 
 MIDDLEWARE = [
@@ -110,9 +111,9 @@ USE_TZ = True
 
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.AllowAny',
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -123,6 +124,8 @@ DJOSER = {
     # 'LOGIN_FIELD': 'email'
     'SERIALIZERS': {
         'token_create': 'api.serializers.TokenCreateSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+        'user': 'api.serializers.UserSerializer',
     },
     'PERMISSIONS': {
         "user": ["rest_framework.permissions.IsAuthenticated"],
