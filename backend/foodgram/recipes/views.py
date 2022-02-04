@@ -1,23 +1,31 @@
-from django.db.models import Sum, F
-from django.shortcuts import render, get_object_or_404
+import io
+
+from django.db.models import F, Sum
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-
-from .models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientInRecipe
-from .serializers import TagSerializer, IngredientSerializer, RecipeSerializer, RecipeCreateSerializer, FavoriteSerializer, ShoppingListSerializer
-from rest_framework.views import APIView
-import reportlab
-import io
-from django.http import FileResponse
 from reportlab.pdfgen import canvas
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import permissions
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import filters
+
+from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                     ShoppingCart, Tag)
+from .serializers import (FavoriteSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeSerializer,
+                          TagSerializer)
 
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     http_method_names = ["get"]
+
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
@@ -29,6 +37,9 @@ class IngredientsViewSet(viewsets.ModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('tags',)
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
@@ -45,11 +56,13 @@ class FavoriteView(APIView):
         favorites = get_object_or_404(Favorite, user=user,
                                       recipe=recipe)
         favorites.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, id):
         user = request.user
         recipe = Recipe.objects.get(id=id)
+        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
         Favorite.objects.get_or_create(user=user, recipe=recipe)
         serializer = FavoriteSerializer(recipe, context={'request':
                                              request})
@@ -101,11 +114,13 @@ class ShoppingCardView(APIView):
         favorites = get_object_or_404(ShoppingCart, user=user,
                                       recipe=recipe)
         favorites.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, id):
         user = request.user
         recipe = Recipe.objects.get(id=id)
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
         ShoppingCart.objects.get_or_create(user=user, recipe=recipe)
         serializer = FavoriteSerializer(recipe, context={'request':
                                              request})

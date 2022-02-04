@@ -1,7 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.contrib.auth import get_user_model
-
 
 User = get_user_model()
 
@@ -38,7 +37,7 @@ class Ingredient(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f'{self.name}, {self.measurement_unit}'
 
 
 class Recipe(models.Model):
@@ -75,8 +74,11 @@ class Recipe(models.Model):
         related_name="recipes",
         through="IngredientInRecipe")
 
+    def recipe_count(self):
+        return self.favorite.count()
+
     def __str__(self):
-        return self.name
+        return f'{self.name} от {self.author}'
 
 
 class IngredientInRecipe(models.Model):

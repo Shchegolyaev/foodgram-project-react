@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
     'djoser',
     'api',
@@ -109,6 +110,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+DJOSER = {
+    # 'LOGIN_FIELD': 'email'
+    'SERIALIZERS': {
+        'token_create': 'users.serializers.TokenCreateSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+        'user': 'users.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        "user": ["rest_framework.permissions.IsAuthenticated"],
+        "user_list": ["rest_framework.permissions.AllowAny"],
+    },
+    "HIDE_USERS": False,
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -120,19 +134,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
-DJOSER = {
-    # 'LOGIN_FIELD': 'email'
-    'SERIALIZERS': {
-        'token_create': 'api.serializers.TokenCreateSerializer',
-        'current_user': 'api.serializers.UserSerializer',
-        'user': 'api.serializers.UserSerializer',
-    },
-    'PERMISSIONS': {
-        "user": ["rest_framework.permissions.IsAuthenticated"],
-        "user_list": ["rest_framework.permissions.AllowAny"],
-    },
-    "HIDE_USERS": False,
-}
+
 
 
 # Static files (CSS, JavaScript, Images)

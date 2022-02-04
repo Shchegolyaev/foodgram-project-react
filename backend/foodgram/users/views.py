@@ -1,13 +1,17 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import filters, status, viewsets
-from .models import User, Follow
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import filters
+
+from .models import Follow, User
 from .serializers import SubscriptionsSerializer
 
 
 class ListSubscriptions(viewsets.ModelViewSet):
     serializer_class = SubscriptionsSerializer
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ('recipe.id',)
 
     def get_queryset(self):
         user = self.request.user
@@ -23,11 +27,13 @@ class Subscribe(APIView):
         subscription = get_object_or_404(Follow, user=user,
                                          author=author)
         subscription.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, id):
         user = request.user
         author = User.objects.get(id=id)
+        if user == author or Follow.objects.filter(user=user, author=author).exists():
+            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
         Follow.objects.get_or_create(user=user, author=author)
         serializer = SubscriptionsSerializer(author, context={'request':
                                              request})
