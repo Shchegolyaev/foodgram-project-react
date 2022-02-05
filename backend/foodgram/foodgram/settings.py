@@ -1,5 +1,7 @@
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
@@ -18,8 +20,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework.authtoken',
     'djoser',
-    'api',
     'users',
     'recipes',
 ]
@@ -68,6 +67,16 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
 # Database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': os.getenv('DB_PORT')
+#     }
+# }
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
@@ -76,7 +85,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -97,9 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -110,19 +115,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-DJOSER = {
-    # 'LOGIN_FIELD': 'email'
-    'SERIALIZERS': {
-        'token_create': 'users.serializers.TokenCreateSerializer',
-        'current_user': 'users.serializers.UserSerializer',
-        'user': 'users.serializers.UserSerializer',
-    },
-    'PERMISSIONS': {
-        "user": ["rest_framework.permissions.IsAuthenticated"],
-        "user_list": ["rest_framework.permissions.AllowAny"],
-    },
-    "HIDE_USERS": False,
-}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -136,12 +128,19 @@ REST_FRAMEWORK = {
 }
 
 
+DJOSER = {
+    # 'LOGIN_FIELD': 'email'
+    'SERIALIZERS': {
+        'token_create': 'users.serializers.TokenCreateSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+        'user': 'users.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        "user": ["recipes.permissions.OwnerOrReadOnly"],
+        "user_list": ["recipes.permissions.OwnerOrReadOnly"],
+    },
+    "HIDE_USERS": False,
+}
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-ROLE_GUEST = 'guest'
-ROLE_USER = 'user'
-ROLE_ADMIN = 'admin'

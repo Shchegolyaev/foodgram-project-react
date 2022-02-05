@@ -3,16 +3,14 @@ import io
 from django.db.models import F, Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from rest_framework import status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import permissions
-from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework import filters
+from .permissions import OwnerOrReadOnly
 
 from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                      ShoppingCart, Tag)
@@ -25,21 +23,23 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     http_method_names = ["get"]
-
+    pagination_class = None
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     http_method_names = ["get"]
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (OwnerOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_fields = ('tags',)
+    ordering_fields = ('id',)
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PATCH']:
