@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
+from colorfield.fields import ColorField
 
 User = get_user_model()
 
@@ -11,10 +12,10 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Название'
     )
-    color = models.CharField(
-        max_length=200,
+    color = ColorField(
+        format='hexa',
         unique=True,
-        verbose_name='Цветовой HEX-код'
+        verbose_name='Цветовой код'
     )
     slug = models.SlugField(
         unique=True,
@@ -121,6 +122,9 @@ class Favorite(models.Model):
                                     name="unique_favorite")
         ]
 
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
+
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
@@ -139,3 +143,5 @@ class ShoppingCart(models.Model):
             models.UniqueConstraint(fields=["user", "recipe"],
                                     name="unique_shopping_list")
         ]
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
