@@ -7,14 +7,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .permissions import OwnerOrReadOnly
-from rest_framework.decorators import action
 
+from .filters import RecipeFilter
 from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                      ShoppingCart, Tag)
+from .permissions import OwnerOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           TagSerializer)
@@ -39,6 +39,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (OwnerOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filterset_class = RecipeFilter
     filterset_fields = ('tags',)
     ordering_fields = ('id',)
 

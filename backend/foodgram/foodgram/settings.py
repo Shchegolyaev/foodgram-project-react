@@ -1,4 +1,6 @@
 import os
+
+import django_filters.rest_framework
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,7 +35,7 @@ INSTALLED_APPS = [
     'djoser',
     'users',
     'recipes',
-    'colorfield'
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +120,9 @@ USE_TZ = True
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
