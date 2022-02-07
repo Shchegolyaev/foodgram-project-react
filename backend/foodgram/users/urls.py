@@ -6,9 +6,10 @@ from .views import ListSubscriptions, Subscribe
 router = DefaultRouter()
 router.register(r"subscriptions", ListSubscriptions, basename="subscriptions")
 
-urlpatterns =[
+urlpatterns = [
     path(r'', include('djoser.urls')),
     path('users/', include(router.urls)),
-    path(f'users/<int:id>/subscribe/', Subscribe.as_view()),
+    path('users/<int:id>/subscribe/', Subscribe.as_view(),
+         name='subscribe'),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

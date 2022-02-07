@@ -4,19 +4,18 @@ import django_filters.rest_framework
 from dotenv import load_dotenv
 
 load_dotenv()
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AUTH_USER_MODEL = 'users.User'
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'e_(@iiripuu!mjqbrzw9!1#ip#$5dup++4u3euh7$39)3m%ksu'
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    load_dotenv(dotenv_file)
 
-# SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = os.environ['SECRET_KEY']
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -69,18 +68,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
-# Database
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
-#         'NAME': os.getenv('DB_NAME'),
-#         'USER': os.getenv('POSTGRES_USER'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-#         'HOST': os.getenv('DB_HOST'),
-#         'PORT': os.getenv('DB_PORT')
+#         'ENGINE': os.getenv('DB_ENGINE', default="django.db.backends.postgresql"),
+#         'NAME': os.getenv('DB_NAME', default="postgres"),
+#         'USER': os.getenv('POSTGRES_USER', default="postgres"),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="postgres"),
+#         'HOST': os.getenv('DB_HOST', default="db"),
+#         'PORT': os.getenv('DB_PORT', default="5432")
 #     }
 # }
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -88,9 +86,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -135,7 +130,6 @@ REST_FRAMEWORK = {
 
 
 DJOSER = {
-    # 'LOGIN_FIELD': 'email'
     'SERIALIZERS': {
         'token_create': 'users.serializers.TokenCreateSerializer',
         'current_user': 'users.serializers.UserSerializer',

@@ -4,7 +4,6 @@ from djoser.conf import settings
 from rest_framework import serializers
 
 from recipes.models import Recipe
-from users.models import Follow
 
 from .models import Follow
 
@@ -41,11 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TokenCreateSerializer(serializers.Serializer):
-    password = serializers.CharField(required=False, style={"input_type": "password"})
+    password = serializers.CharField(required=False,
+                                     style={"input_type": "password"})
 
     default_error_messages = {
-        "invalid_credentials": settings.CONSTANTS.messages.INVALID_CREDENTIALS_ERROR,
-        "inactive_account": settings.CONSTANTS.messages.INACTIVE_ACCOUNT_ERROR,
+        "invalid_credentials":
+            settings.CONSTANTS.messages.INVALID_CREDENTIALS_ERROR,
+        "inactive_account":
+            settings.CONSTANTS.messages.INACTIVE_ACCOUNT_ERROR,
     }
 
     def __init__(self, *args, **kwargs):

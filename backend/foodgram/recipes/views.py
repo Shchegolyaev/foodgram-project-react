@@ -20,6 +20,38 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
                           TagSerializer)
 
 
+def delete(request, id, model):
+    user = request.user
+    recipe = get_object_or_404(Recipe, id=id)
+    if not (user == user or model.objects.filter(
+            user=user, recipe=recipe).exists()):
+        return Response(
+            {"errors": "Ошибка удаления из избранного/списка покупок"
+                       " (Например, когда рецепта там не было"},
+            status=status.HTTP_400_BAD_REQUEST)
+    obj = get_object_or_404(model, user=user,
+                            recipe=recipe)
+    obj.delete()
+    return Response({"errors": "Рецепт успешно удален из "
+                               "избранного/списка покупок"},
+                    status=status.HTTP_204_NO_CONTENT)
+
+
+def post(request, id, model):
+    user = request.user
+    recipe = Recipe.objects.get(id=id)
+    if model.objects.filter(user=user, recipe=recipe).exists():
+        return Response(
+            {"errors": "Ошибка добавления в избранное/список покупок "
+                       "(Например, когда рецепт уже есть в "
+                       "избранном/списке покупок)"},
+            status=status.HTTP_400_BAD_REQUEST)
+    model.objects.get_or_create(user=user, recipe=recipe)
+    serializer = FavoriteSerializer(recipe, context={'request':
+                                                     request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -53,36 +85,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class FavoriteView(APIView):
 
     def delete(self, request, id):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=id)
-        favorites = get_object_or_404(Favorite, user=user,
-                                      recipe=recipe)
-        favorites.delete()
-        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
+        return delete(request, id, Favorite)
 
     def post(self, request, id):
-        user = request.user
-        recipe = Recipe.objects.get(id=id)
-        if Favorite.objects.filter(user=user, recipe=recipe).exists():
-            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
-        Favorite.objects.get_or_create(user=user, recipe=recipe)
-        serializer = FavoriteSerializer(recipe, context={'request':
-                                             request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return post(request, id, Favorite)
 
 
 class ShoppingCardView(APIView):
 
     def get(self, request):
         user = request.user
-        string = ''
         shopping_list = IngredientInRecipe.objects.filter(
             recipe__shopping_cart__user=user).values(
             name=F('ingredient__name'),
             unit=F('ingredient__measurement_unit')
-        ).annotate(amount=Sum('amount')).order_by()
+        ).annotate(amount=Sum('amount'))
         font = 'DejaVuSerif'
-        pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', 'UTF-8'))
+        pdfmetrics.registerFont(TTFont('DejaVuSerif',
+                                       'DejaVuSerif.ttf',
+                                       'UTF-8'))
         buffer = io.BytesIO()
         pdf_file = canvas.Canvas(buffer)
         pdf_file.setFont(font, 24)
@@ -108,22 +129,11 @@ class ShoppingCardView(APIView):
         pdf_file.showPage()
         pdf_file.save()
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='shopping_list.pdf')
+        return FileResponse(buffer, as_attachment=True,
+                            filename='shopping_list.pdf')
 
     def delete(self, request, id):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=id)
-        favorites = get_object_or_404(ShoppingCart, user=user,
-                                      recipe=recipe)
-        favorites.delete()
-        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
+        return delete(request, id, ShoppingCart)
 
     def post(self, request, id):
-        user = request.user
-        recipe = Recipe.objects.get(id=id)
-        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
-        ShoppingCart.objects.get_or_create(user=user, recipe=recipe)
-        serializer = FavoriteSerializer(recipe, context={'request':
-                                             request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return post(request, id, ShoppingCart)

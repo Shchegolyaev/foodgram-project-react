@@ -26,6 +26,9 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Тэг'
+
 
 class Ingredient(models.Model):
     name = models.CharField(
@@ -40,6 +43,9 @@ class Ingredient(models.Model):
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
 
+    class Meta:
+        verbose_name = 'Ингридиент'
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
@@ -53,33 +59,38 @@ class Recipe(models.Model):
         db_index=True,
         verbose_name='Название',
     )
-    image = models.CharField(
-        max_length=200,
-        verbose_name='Картинка, закодированная в Base64'
+    image = models.ImageField(
+        verbose_name="Картинка",
+        upload_to='media/recipes/images/'
     )
     text = models.TextField(
         verbose_name='Описание'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1, message="Минимальное время приготовления - одна минута")],
+        validators=[MinValueValidator(
+            1,
+            message="Минимальное время приготовления - одна минута")],
         verbose_name='Время приготовления (в минутах)'
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name="Тэги",
-        related_name="recipes"
+        verbose_name='Тэги',
+        related_name='recipes'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        verbose_name="Ингредиенты",
-        related_name="recipes",
-        through="IngredientInRecipe")
+        verbose_name='Ингредиенты',
+        related_name='recipes',
+        through='IngredientInRecipe')
 
     def recipe_count(self):
         return self.favorite.count()
 
     def __str__(self):
         return f'{self.name} от {self.author}'
+
+    class Meta:
+        verbose_name = 'Рецепт'
 
 
 class IngredientInRecipe(models.Model):
@@ -94,29 +105,39 @@ class IngredientInRecipe(models.Model):
         related_name='ingredient_to_recipe'
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name="Количество ингредиентов",
+        verbose_name='Количество ингредиентов',
         validators=(
-            MinValueValidator(1, "Минимальное количество ингредиентов 1"),
+            MinValueValidator(1, 'Минимальное количество ингредиентов 1'),
         )
     )
 
     def __str__(self):
         return f'{self.recipe} - {self.ingredient}'
 
+    class Meta:
+        verbose_name = 'Ингридиент в рецепте'
+        constraints = [
+            models.UniqueConstraint(fields=["ingredient", "recipe"],
+                                    name="unique_ingredient_in_recipe")
+        ]
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         related_name='favorite',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name="favorite",
-        on_delete=models.CASCADE
+        related_name='favorite',
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт'
     )
 
     class Meta:
+        verbose_name = 'Избранное'
         constraints = [
             models.UniqueConstraint(fields=["user", "recipe"],
                                     name="unique_favorite")
@@ -130,18 +151,22 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         related_name="shopping_cart",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         Recipe,
         related_name="shopping_cart",
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт'
     )
 
     class Meta:
+        verbose_name = 'Список покупок'
         constraints = [
             models.UniqueConstraint(fields=["user", "recipe"],
                                     name="unique_shopping_list")
         ]
+
     def __str__(self):
         return f'{self.user} - {self.recipe}'

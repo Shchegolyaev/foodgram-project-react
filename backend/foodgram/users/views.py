@@ -23,16 +23,26 @@ class Subscribe(APIView):
     def delete(self, request, id):
         user = request.user
         author = get_object_or_404(User, id=id)
+        if not (user == author or Follow.objects.filter(
+                user=user, author=author).exists()):
+            return Response(
+                {"errors": "Ошибка подписки (Например, если не был подписан"},
+                status=status.HTTP_400_BAD_REQUEST)
         subscription = get_object_or_404(Follow, user=user,
                                          author=author)
         subscription.delete()
-        return Response({"errors": "string"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"errors": "Успешная отписка"},
+                        status=status.HTTP_204_NO_CONTENT)
 
     def post(self, request, id):
         user = request.user
-        author = User.objects.get(id=id)
-        if user == author or Follow.objects.filter(user=user, author=author).exists():
-            return Response({"errors": "string"}, status=status.HTTP_400_BAD_REQUEST)
+        author = get_object_or_404(User, id=id)
+        if user == author or Follow.objects.filter(user=user,
+                                                   author=author).exists():
+            return Response(
+                {"errors": "Ошибка подписки (Например, если уже "
+                           "подписан или подписке на самого себя"},
+                status=status.HTTP_400_BAD_REQUEST)
         Follow.objects.get_or_create(user=user, author=author)
         serializer = SubscriptionsSerializer(author, context={'request':
                                              request})
