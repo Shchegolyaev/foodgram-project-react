@@ -147,7 +147,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        if 'ingredients' in self.initial_data:
+        if 'ingredient_to_recipe' in validated_data:
             ingredients = validated_data.pop('ingredient_to_recipe')
             recipe.ingredients.clear()
             self.create_ingredients(ingredients, recipe)
