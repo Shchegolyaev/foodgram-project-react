@@ -2,12 +2,12 @@ import io
 
 from django.db.models import F, Sum
 from django.http import FileResponse
-
 from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import filters, viewsets
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from .filters import RecipeFilter
@@ -22,15 +22,17 @@ from .utils import delete, post
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    http_method_names = ["get"]
+    permission_classes = (AllowAny,)
     pagination_class = None
+    http_method_names = ["get"]
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    http_method_names = ["get"]
+    permission_classes = (AllowAny,)
     pagination_class = None
+    http_method_names = ["get"]
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

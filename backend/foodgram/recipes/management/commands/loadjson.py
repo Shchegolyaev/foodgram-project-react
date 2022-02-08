@@ -1,17 +1,21 @@
+import json
+
+from django.core.management.base import BaseCommand, CommandError
+from recipes.models import Ingredient
 
 
+class Command(BaseCommand):
 
-class A():
-    def m(self):
-        print("A")
+    def add_arguments(self, parser):
+        parser.add_argument("--path", type=str, help="file path")
 
-class B():
-    def m(self):
-        print("B")
+    def handle(self, *args, **options):
+        file_path = options["path"]
 
-class C(A, B):
-    def m(self):
-        super().m()
-        print("C")
+        with open(file_path, encoding='utf-8') as f:
 
-C().m()
+            data = json.load(f)
+            for item in data:
+                Ingredient.objects.create(
+                    name=item['name'],
+                    measurement_unit=item['measurement_unit'])

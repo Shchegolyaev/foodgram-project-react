@@ -1,11 +1,9 @@
 from django.contrib.auth import authenticate, get_user_model
-
 from djoser.compat import get_user_email, get_user_email_field_name
 from djoser.conf import settings
 from rest_framework import serializers
 
 from recipes.models import Recipe
-
 from .models import Follow
 
 User = get_user_model()

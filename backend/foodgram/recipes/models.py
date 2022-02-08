@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-
 from colorfield.fields import ColorField
 
 User = get_user_model()
@@ -13,7 +12,7 @@ class Tag(models.Model):
         unique=True,
         verbose_name="Название")
     color = ColorField(
-        format="hexa",
+        default='#FF0000',
         unique=True,
         verbose_name="Цветовой код")
     slug = models.SlugField(
@@ -92,6 +91,7 @@ class Recipe(models.Model):
         return f"{self.name} от {self.author}"
 
     class Meta:
+        ordering = ["-id"]
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
 

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
-
 from rest_framework import filters, status, viewsets
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,6 +11,7 @@ from .serializers import SubscriptionsSerializer
 class ListSubscriptions(viewsets.ModelViewSet):
     serializer_class = SubscriptionsSerializer
     filter_backends = (filters.OrderingFilter,)
+    pagination_class = LimitOffsetPagination
     ordering_fields = ("recipe.id",)
 
     def get_queryset(self):
