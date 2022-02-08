@@ -16,17 +16,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id',
-                  'email',
-                  'username',
-                  'first_name',
-                  'last_name',
-                  'is_subscribed')
+        fields = ("id", "email", "username", "first_name", "last_name",
+                  "is_subscribed")
 
     def get_is_subscribed(self, author):
-        if self.context['request'].user.is_authenticated and \
-                Follow.objects.filter(user=self.context['request'].user,
-                                      author=author).exists():
+        if (
+            self.context["request"].user.is_authenticated
+            and Follow.objects.filter(
+                user=self.context["request"].user, author=author
+            ).exists()
+        ):
             return True
         return False
 
@@ -74,13 +73,9 @@ class TokenCreateSerializer(serializers.Serializer):
 
 
 class FollowingRecipeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Recipe
-        fields = ('id',
-                  'name',
-                  'image',
-                  'cooking_time')
+        fields = ("id", "name", "image", "cooking_time")
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
@@ -90,22 +85,25 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email',
-                  'id',
-                  'username',
-                  'first_name',
-                  'last_name',
-                  'is_subscribed',
-                  'recipe',
-                  'recipes_count',)
+        fields = (
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipe",
+            "recipes_count",
+        )
 
     def get_recipe(self, author):
         recipes = author.recipes.all()
         return FollowingRecipeSerializer(recipes, many=True).data
 
     def get_is_subscribed(self, author):
-        if Follow.objects.filter(author=author,
-                                 user=self.context['request'].user).exists():
+        if Follow.objects.filter(
+            author=author, user=self.context["request"].user
+        ).exists():
             return True
         return False
 
