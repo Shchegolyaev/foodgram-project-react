@@ -8,9 +8,7 @@ services:
       - ./.env
 
   backend:
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
+    image: atreids/backend:v1.0.0
     restart: always
     volumes:
       - static_value:/app/static/
@@ -23,9 +21,7 @@ services:
       - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: atreids/frontend:v1.0.0
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
