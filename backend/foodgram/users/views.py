@@ -16,8 +16,8 @@ class ListSubscriptions(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        new_queryset = User.objects.filter(following__user=user)
-        return new_queryset
+        queryset = User.objects.filter(following__user=user)
+        return queryset
 
 
 class Subscribe(APIView):

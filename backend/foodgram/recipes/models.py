@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class Tag(models.Model):
+    ordering = ["-id"]
     name = models.CharField(
         max_length=200,
         unique=True,
@@ -41,7 +42,6 @@ class Ingredient(models.Model):
         return f"{self.name}, {self.measurement_unit}"
 
     class Meta:
-        ordering = ["-id"]
         verbose_name = "Ингридиент"
         verbose_name_plural = "Ингридиенты"
 

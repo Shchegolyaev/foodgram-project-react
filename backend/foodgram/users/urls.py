@@ -9,7 +9,8 @@ router.register(r"", ListSubscriptions, basename="subscriptions")
 
 urlpatterns = [
     path("users/subscriptions/", include(router.urls)),
-    path(r"", include("djoser.urls")),
+
     path("users/<int:id>/subscribe/", Subscribe.as_view(), name="subscribe"),
+    path(r"", include("djoser.urls")),
     re_path(r"^auth/", include("djoser.urls.authtoken")),
 ]
