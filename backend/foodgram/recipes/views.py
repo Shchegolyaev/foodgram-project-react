@@ -7,10 +7,12 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import filters, viewsets
+from rest_framework.pagination import PageNumberPagination, \
+    LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientSearchFilter
 from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                      ShoppingCart, Tag)
 from .permissions import OwnerOrReadOnly
@@ -31,6 +33,8 @@ class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
+    filter_backends = (IngredientSearchFilter,)
+    search_fields = ('^name',)
     pagination_class = None
     http_method_names = ["get"]
 
@@ -41,7 +45,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (OwnerOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = RecipeFilter
-    filterset_fields = ("tags",)
+    filterset_fields = ("tags", "author")
     ordering_fields = ("id",)
 
     def get_serializer_class(self):

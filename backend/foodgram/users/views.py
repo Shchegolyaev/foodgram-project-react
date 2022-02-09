@@ -1,18 +1,16 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Follow, User
 from .serializers import SubscriptionsSerializer
+from .pagination import LimitPageNumberPagination
 
 
 class ListSubscriptions(viewsets.ModelViewSet):
     serializer_class = SubscriptionsSerializer
-    filter_backends = (filters.OrderingFilter,)
-    pagination_class = LimitOffsetPagination
-    ordering_fields = ("recipe.id",)
+    pagination_class = LimitPageNumberPagination
 
     def get_queryset(self):
         user = self.request.user
