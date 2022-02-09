@@ -10,7 +10,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 AUTH_USER_MODEL = "users.User"
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
