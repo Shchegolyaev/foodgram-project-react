@@ -13,6 +13,23 @@
 
 On this service, users will be able to publish recipes, subscribe to publications of other users, add favorite recipes to the "Favorites" list, and before going to the store, download a summary list of products needed to prepare one or more selected dishes.
 
+## Project deployed:
+The project is hosted in 4 containers (backend, frontend, postgres, nginx) on 
+an Ubuntu virtual machine on the Yandex Cloud service.
+
+```foodhelper.ddns.net/recipes```
+
+Admin account:
+```sh
+* username: administrator
+* password: admin
+```
+
+User account:
+```
+* email: test@test.ru
+* password: Test1111
+```
 
 ## Set up ci/cd:
 * Test on flake8
@@ -35,20 +52,7 @@ On this service, users will be able to publish recipes, subscribe to publication
 
 
 
-## Project deployed:
-```foodhelper.ddns.net```
 
-Admin account:
-```sh
-* username: administrator
-* password: admin
-```
-
-User account:
-```
-* email: test@test.ru
-* password: Test1111
-```
 
 ## Contact
 ```sh
