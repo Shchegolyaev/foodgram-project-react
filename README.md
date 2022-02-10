@@ -33,6 +33,12 @@ User account:
 * password: Test1111
 ```
 
+## API documentation
+
+```
+http://foodhelper.ddns.net/api/docs/
+```
+
 ## Set up ci/cd:
 * Test on flake8
 * Build and push to DockerHub
