@@ -5,10 +5,10 @@ services:
     volumes:
       - /var/lib/postgresql/data/
     env_file:
-      - ./.env
+      - .env
 
   backend:
-    image: atreids/backend:1.0.1
+    image: atreids/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -18,10 +18,10 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env
+      - .env
 
   frontend:
-    image: atreids/frontend:v1.0.0
+    image: atreids/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
@@ -40,7 +40,6 @@ services:
 
     depends_on:
       - backend
-
 
 volumes:
   static_value:
