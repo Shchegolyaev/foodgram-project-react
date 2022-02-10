@@ -16,12 +16,13 @@ On this service, users will be able to publish recipes, subscribe to publication
 ## Project deployed:
 The project is hosted in 4 containers (backend, frontend, postgres, nginx) on 
 an Ubuntu virtual machine on the Yandex Cloud service.
+
 <code>[foodhelper.ddns.net/recipes](http://foodhelper.ddns.net/recipes)
 </code>
-``````
+
 
 Admin account:
-```sh
+```
 * username: administrator
 * password: admin
 ```
