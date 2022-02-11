@@ -149,7 +149,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 recipe=recipe,
             ).exists():
                 raise serializers.ValidationError(
-                    'Убедитесь, что отсутствуют повторяющиеся ингридиенты'
+                    'Убедитесь, что отсутствуют повторяющиеся ингредиенты'
                 )
             IngredientInRecipe.objects.create(
                 ingredient=current_ingredient,

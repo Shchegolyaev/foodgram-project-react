@@ -43,8 +43,8 @@ class Ingredient(models.Model):
         return f"{self.name}, {self.measurement_unit}"
 
     class Meta:
-        verbose_name = "Ингридиент"
-        verbose_name_plural = "Ингридиенты"
+        verbose_name = "Ингредиент"
+        verbose_name_plural = "Ингредиенты"
 
 
 class Recipe(models.Model):
@@ -118,8 +118,8 @@ class IngredientInRecipe(models.Model):
         return f"{self.recipe} - {self.ingredient}"
 
     class Meta:
-        verbose_name = "Ингридиент в рецепте"
-        verbose_name_plural = "Ингридиенты в рецепте"
+        verbose_name = "Ингредиент в рецепте"
+        verbose_name_plural = "Ингредиенты в рецепте"
         constraints = [
             models.UniqueConstraint(
                 fields=["ingredient", "recipe"],
