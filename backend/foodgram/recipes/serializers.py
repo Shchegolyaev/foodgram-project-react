@@ -86,6 +86,13 @@ class IngredientToCreateRecipeSerializer(serializers.Serializer):
         model = IngredientInRecipe
         fields = ("id", "name", "measurement_unit", "amount")
 
+    def validate_amount(self, value):
+        if value < 1:
+            raise serializers.ValidationError(
+                'Убедитесь, что количество ингредиентов больше 1'
+            )
+        return value
+
     def get_measurement_unit(self, ingredient):
         measurement_unit = ingredient.ingredient.measurement_unit
         return measurement_unit
@@ -137,6 +144,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
             current_ingredient = ingredient["id"]
+            if IngredientInRecipe.objects.filter(
+                ingredient=current_ingredient,
+                recipe=recipe,
+            ).exists():
+                raise serializers.ValidationError(
+                    'Убедитесь, что отсутствуют повторяющиеся ингридиенты'
+                )
             IngredientInRecipe.objects.create(
                 ingredient=current_ingredient,
                 recipe=recipe,

@@ -15,6 +15,7 @@ from reportlab.pdfgen import canvas
 from .filters import IngredientSearchFilter, RecipeFilter
 from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                      ShoppingCart, Tag)
+from .pagination import LimitPageNumberPagination
 from .permissions import OwnerOrReadOnly
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeSerializer, TagSerializer)
@@ -44,6 +45,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (OwnerOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    pagination_class = LimitPageNumberPagination
     filterset_class = RecipeFilter
     filterset_fields = ("tags", "author")
     ordering_fields = ("id",)
